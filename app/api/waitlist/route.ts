@@ -1,15 +1,25 @@
-﻿import { NextResponse } from 'next/server';
+import { neon } from '@neondatabase/serverless'
+import { NextResponse } from 'next/server'
 
-// Simple mock handler that echoes back a friendly confirmation message.
-export async function POST(request: Request) {
-  const payload = await request.json().catch(() => ({}));
-  const name = typeof payload.name === 'string' && payload.name.trim().length > 0 ? payload.name.trim() : 'friend';
-  const audience = typeof payload.audience === 'string' && payload.audience.length > 0 ? payload.audience : 'your loved one';
+const sql = neon(process.env.DATABASE_URL!)
 
-  return NextResponse.json(
-    {
-      message: `Thanks, ${name}! We are saving your spot for ${audience} and will share a quiet invite soon.`,
-    },
-    { status: 201 }
-  );
+export async function POST(req: Request) {
+  try {
+    const { name, email, audience } = await req.json()
+
+    if (!email || !email.includes('@')) {
+      return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
+    }
+
+    await sql`
+      INSERT INTO waitlist (name, email, audience)
+      VALUES (${name}, ${email}, ${audience})
+      ON CONFLICT (email) DO NOTHING
+    `
+
+    return NextResponse.json({ success: true, message: 'Saved successfully' })
+  } catch (error) {
+    console.error('DB ERROR:', error) // 👈 חשוב!
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+  }
 }

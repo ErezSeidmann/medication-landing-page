@@ -75,6 +75,7 @@ export default function HomePage() {
       }
 
       const data = await res.json();
+      console.log('SERVER RESPONSE:', data);
       setStatus('success');
       setResponseMessage(data.message);
       setEmail('');
