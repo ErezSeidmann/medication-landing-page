@@ -1,4 +1,5 @@
-﻿'use client';
+﻿
+'use client';
 
 import { FormEvent, useState } from 'react';
 
@@ -42,7 +43,9 @@ export default function HomePage() {
   const [responseMessage, setResponseMessage] = useState('');
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    
     event.preventDefault();
+
     if (!name.trim()) {
       setStatus('error');
       setResponseMessage('Please tell us your name so we can personalize the invite.');
