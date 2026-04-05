@@ -1,250 +1,356 @@
-﻿
-'use client';
+﻿"use client";
 
-import { FormEvent, useState } from 'react';
+import { useState } from "react";
+import {
+  ShieldCheck,
+  CheckCircle2,
+  Bot,
+  Eye,
+  BellRing,
+  Smile,
+  Users,
+  BarChart3,
+} from "lucide-react";
 
-const steps = [
-  {
-    title: 'Parent gets a simple daily reminder',
-    description:
-      'A calm, easy prompt arrives at the same time every day so no one has to nag or guess.',
-  },
-  {
-    title: 'They confirm with one tap',
-    description:
-      'A single tap is enough to tell you they remembered without a call or text.',
-  },
-  {
-    title: 'You get a quiet confirmation',
-    description:
-      'You receive a subtle update that lets you breathe a little easier even when you are busy.',
-  },
-];
+export default function Page() {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
 
-const benefits = [
-  'Reduce daily worry',
-  'Respect independence',
-  'Stay informed without calling',
-];
-
-const audienceOptions = [
-  { value: 'parent', label: 'My parent' },
-  { value: 'spouse', label: "My spouse's parent" },
-  { value: 'both', label: 'Both' },
-];
-
-type SubmissionStatus = 'idle' | 'sending' | 'success' | 'error';
-
-export default function HomePage() {
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [audience, setAudience] = useState(audienceOptions[0].value);
-  const [status, setStatus] = useState<SubmissionStatus>('idle');
-  const [responseMessage, setResponseMessage] = useState('');
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    
-    event.preventDefault();
-
-    if (!name.trim()) {
-      setStatus('error');
-      setResponseMessage('Please tell us your name so we can personalize the invite.');
-      return;
-    }
-
-    if (!email.trim()) {
-      setStatus('error');
-      setResponseMessage('Please add an email so we know where to reach you.');
-      return;
-    }
-
-    setStatus('sending');
-    setResponseMessage('');
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setStatus("loading");
+    setMessage("");
 
     try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
         headers: {
-          'content-type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), audience }),
+        body: JSON.stringify({
+          email,
+          name: fullName,
+        }),
       });
 
       if (!res.ok) {
-        throw new Error('Failed to submit');
+        throw new Error("Failed to join waitlist");
       }
 
-      const data = await res.json();
-      console.log('SERVER RESPONSE:', data);
-      setStatus('success');
-      setResponseMessage(data.message);
-      setEmail('');
-      setName('');
+      setStatus("success");
+      setMessage("You’re on the list. We’ll be in touch soon.");
+      setFullName("");
+      setEmail("");
     } catch (error) {
-      console.error(error);
-      setStatus('error');
-      setResponseMessage('Something went wrong. Please try again soon.');
+      setStatus("error");
+      setMessage("Something went wrong. Please try again.");
     }
   }
 
-  const isSending = status === 'sending';
-
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-100 to-slate-50 px-4 py-12 md:py-20">
-      <div className="mx-auto max-w-6xl space-y-16">
-        {/* Hero section introduces the service and sets an emotional, reassuring tone. */}
-        <section className="rounded-[32px] border border-transparent bg-gradient-to-br from-slate-900/95 via-ocean-deep/90 to-slate-800/95 p-10 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.9)] text-slate-50">
-          <div className="flex flex-col gap-10 md:flex-row md:items-center">
-            <div className="flex-1 space-y-6">
-              <p className="text-[0.65rem] uppercase tracking-[0.5em] text-slate-300">Medication check-in</p>
-              <h1 className="text-3xl font-semibold text-white sm:text-4xl md:text-5xl">
-                Know your parents took their medication—without asking.
-              </h1>
-              <p className="text-lg leading-relaxed text-slate-200">
-                A simple way to get daily peace of mind while giving them the dignity to stay in control. Quiet
-                confidence, gently delivered, for adult children who worry their parents might miss a dose.
-              </p>
-              <div className="flex flex-col gap-3 md:flex-row md:items-center">
-                <a
-                  href="#waitlist"
-                  className="inline-flex items-center justify-center rounded-full bg-[#f4f7ff]/90 px-7 py-3 text-base font-semibold text-slate-900 shadow-[0_15px_45px_-25px_rgba(15,23,42,0.8)] transition hover:bg-white/95"
-                >
-                  Join the waitlist
-                </a>
-                <p className="text-sm text-slate-200">
-                  Peace of mind confirmed in under five seconds, every morning.
-                </p>
-              </div>
-            </div>
-            <div className="flex-1 rounded-[28px] border border-white/20 bg-slate-950/60 p-6 text-slate-100 shadow-[0_25px_60px_-35px_rgba(15,23,42,0.85)]">
-              <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Quiet confidence</p>
-              <p className="mt-3 text-xl font-semibold text-white">Check in without interrupting the routine.</p>
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                Gentle reminders for them, calm confirmations for you—right when the medication is taken.
-              </p>
-            </div>
-          </div>
-        </section>
+    <main className="min-h-screen bg-[#f8f9ff] text-slate-900">
+      <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <a href="#" className="flex items-center gap-2">
+            <ShieldCheck className="h-7 w-7 text-slate-900" />
+            <span className="text-xl font-bold tracking-tight">Serene Guardian</span>
+          </a>
 
-        {/* How it works section outlines the simple, respectful experience parents and children share. */}
-        <section className="space-y-10 rounded-[32px] border border-slate-900/10 bg-gradient-to-br from-slate-900/5 via-slate-100 to-slate-50 p-10 shadow-[0_25px_45px_-30px_rgba(15,23,42,0.55)] text-slate-900">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900">How it works</h2>
-              <p className="text-slate-600">Three calm steps keep the routine respectful and organized.</p>
-            </div>
-            <div className="rounded-full border border-slate-300 px-5 py-2 text-sm font-medium text-slate-600">
-              Designed for connection
-            </div>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {steps.map((step) => (
-              <article
-                key={step.title}
-                className="flex h-full flex-col gap-3 rounded-2xl border border-white/70 bg-gradient-to-b from-white via-slate-50 to-slate-100 p-6 text-slate-900 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.8)]"
-              >
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.6em] text-slate-400">Step</p>
-                <h3 className="text-lg font-semibold text-slate-900">{step.title}</h3>
-                <p className="text-sm leading-relaxed text-slate-600">{step.description}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* Benefits section highlights the emotional return for the adult child. */}
-        <section className="space-y-10 rounded-[32px] border border-slate-900/10 bg-gradient-to-br from-slate-900/5 via-slate-100 to-slate-50 p-10 shadow-[0_25px_55px_-30px_rgba(15,23,42,0.55)] text-slate-900">
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Benefits</h2>
-            <p className="text-slate-600">Stay present without micromanaging the daily routine.</p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {benefits.map((benefit) => (
-              <div
-                key={benefit}
-                className="flex flex-1 flex-col gap-3 rounded-2xl border border-white/70 bg-gradient-to-b from-white via-slate-50 to-slate-100 px-6 py-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.7)]"
-              >
-                <p className="text-lg font-semibold text-slate-900">{benefit}</p>
-                <p className="text-sm leading-relaxed text-slate-600">
-                  {benefit === 'Reduce daily worry'
-                    ? 'Track the day-to-day without scrolling back through unread texts or missed calls.'
-                    : benefit === 'Respect independence'
-                    ? 'Let them stay in control while you quietly witness their signal.'
-                    : 'Feel confident that you are informed without needing to ask for updates.'}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Waitlist section collects contact details and shows a thank-you message after each successful submit. */}
-        <section
-          id="waitlist"
-          className="space-y-6 rounded-[32px] border border-slate-900/10 bg-gradient-to-br from-slate-900/5 via-slate-100 to-slate-50 p-10 shadow-[0_30px_60px_-35px_rgba(15,23,42,0.55)] text-slate-900"
-        >
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Join the early access waitlist</h2>
-            <p className="text-slate-600">We will send a quiet invite before the wider release.</p>
-          </div>
-          <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
-            <label className="flex flex-col gap-2 text-sm font-semibold text-slate-600">
-              Full name
-              <input
-                type="text"
-                className="w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-base text-slate-900 shadow-[0_15px_25px_-20px_rgba(15,23,42,0.8)] transition focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder="Your name"
-                required
-              />
-            </label>
-            <label className="flex flex-col gap-2 text-sm font-semibold text-slate-600">
-              Email address
-              <input
-                type="email"
-                className="w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-base text-slate-900 shadow-[0_15px_25px_-20px_rgba(15,23,42,0.8)] transition focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="you@example.com"
-                required
-              />
-            </label>
-            <label className="flex flex-col gap-2 text-sm font-semibold text-slate-600">
-              Who is this for?
-              <select
-                className="w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-base text-slate-900 shadow-[0_15px_25px_-20px_rgba(15,23,42,0.8)] transition focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
-                value={audience}
-                onChange={(event) => setAudience(event.target.value)}
-              >
-                {audienceOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="submit"
-              className="flex items-center justify-center rounded-2xl bg-slate-900 px-8 py-3 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-500"
-              disabled={isSending}
+          <div className="hidden items-center gap-8 md:flex">
+            <a href="#" className="font-medium text-slate-900 transition hover:text-slate-600">
+              Home
+            </a>
+            <a
+              href="#how-it-works"
+              className="text-slate-500 transition hover:text-slate-800"
             >
-              {isSending ? 'Sending...' : 'Get early access'}
-            </button>
-          </form>
-          <p className="text-sm text-slate-600">
-            Adult children worry the most when a dose is missed; this waitlist just listens, then quietly lets you know.
-          </p>
-          {status === 'success' && (
-            <p className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-              {responseMessage || 'Thank you! We will email you as soon as we launch.'}
+              Process
+            </a>
+            <a href="#benefits" className="text-slate-500 transition hover:text-slate-800">
+              Benefits
+            </a>
+            <a
+              href="#waitlist"
+              className="rounded-lg bg-slate-900 px-6 py-2 font-medium text-white transition hover:bg-slate-800"
+            >
+              Join Waitlist
+            </a>
+          </div>
+        </nav>
+      </header>
+
+      <section className="relative overflow-hidden px-6 pb-24 pt-16 md:pb-32 md:pt-24">
+        <div className="absolute right-0 top-0 -z-10 h-72 w-72 rounded-full bg-teal-200/40 blur-3xl" />
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 md:grid-cols-12">
+          <div className="md:col-span-7">
+            <span className="mb-6 block text-sm font-semibold uppercase tracking-[0.12em] text-slate-500">
+              Empowering Independence
+            </span>
+
+            <h1 className="mb-8 max-w-4xl text-5xl font-extrabold leading-tight tracking-tight text-slate-950 md:text-7xl">
+              Know they’re okay—
+              <span className="italic text-teal-700"> without having to ask.</span>
+            </h1>
+
+            <p className="mb-10 max-w-2xl text-xl leading-relaxed text-slate-600">
+              A simple way to get daily peace of mind while giving your parents the dignity
+              to stay in control. No intrusive calls, just gentle reassurance.
             </p>
-          )}
-          {status === 'error' && (
-            <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-              {responseMessage}
+
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <a
+                href="#waitlist"
+                className="rounded-lg bg-slate-900 px-8 py-4 text-center text-lg font-semibold text-white shadow-xl shadow-slate-900/10 transition hover:bg-slate-800"
+              >
+                Join the waitlist
+              </a>
+              <a
+                href="#how-it-works"
+                className="rounded-lg bg-slate-200 px-8 py-4 text-center text-lg font-semibold text-slate-700 transition hover:bg-slate-300"
+              >
+                View how it works
+              </a>
+            </div>
+          </div>
+
+          <div className="relative md:col-span-5">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-2xl shadow-slate-900/10">
+              <img
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYIorkOpRL8N9X5WeFcOGgu9oq5Rh-jfUopO5B8MtWhAlr1Q7uKDgNZ6OtMZZH2fk23Ay-ZIjmQRE0tfHSlicuiRA8HSr053J_UWOu59g_gXqhp0VoCbuplBvhh0t_KPyU0L_-9fwILvoX608ZzDFLZycNceC3XGTkQblh0tMV97rbLpGXHMOJ6VryU4okn42Mzmg1W9OPhFF-rH8jWMgb3vgWJS7ej58G4TyPnGtU4D0sxB5rP95314IO2tgcWYddacxbOiVOEDo"
+                alt="Senior hands holding a glass of water and medication organizer in soft morning light"
+                className="h-full w-full object-cover"
+              />
+
+              <div className="absolute bottom-6 left-6 right-6 rounded-2xl border border-white/30 bg-white/80 p-5 backdrop-blur">
+                <div className="flex items-center gap-4">
+                  <div className="rounded-full bg-teal-200 p-2 text-teal-900">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Activity Log</p>
+                    <p className="text-xs text-slate-600">
+                      Morning dosage confirmed 8:15 AM
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="bg-[#eef4ff] px-6 py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16">
+            <span className="mb-4 block text-sm font-semibold uppercase tracking-[0.12em] text-slate-500">
+              The Process
+            </span>
+            <h2 className="text-4xl font-bold tracking-tight text-slate-950">
+              Seamless and dignified
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div className="group flex aspect-square flex-col justify-between rounded-3xl bg-white p-10 transition hover:-translate-y-1 hover:shadow-xl">
+              <div className="w-fit rounded-xl bg-slate-100 p-4 transition group-hover:bg-slate-900 group-hover:text-white">
+                <Bot className="h-8 w-8" />
+              </div>
+              <div>
+                <h3 className="mb-4 text-2xl font-bold text-slate-950">Smart setup</h3>
+                <p className="leading-relaxed text-slate-600">
+                  Connect the discreet guardian sensor to their existing medication routine
+                  in under five minutes.
+                </p>
+              </div>
+            </div>
+
+            <div className="group flex aspect-square flex-col justify-between rounded-3xl bg-white p-10 transition hover:-translate-y-1 hover:shadow-xl">
+              <div className="w-fit rounded-xl bg-slate-100 p-4 transition group-hover:bg-slate-900 group-hover:text-white">
+                <Eye className="h-8 w-8" />
+              </div>
+              <div>
+                <h3 className="mb-4 text-2xl font-bold text-slate-950">Silent guardian</h3>
+                <p className="leading-relaxed text-slate-600">
+                  Our system detects medication activity without cameras or intrusive daily
+                  check-in calls.
+                </p>
+              </div>
+            </div>
+
+            <div className="group flex aspect-square flex-col justify-between rounded-3xl bg-white p-10 transition hover:-translate-y-1 hover:shadow-xl">
+              <div className="w-fit rounded-xl bg-slate-100 p-4 transition group-hover:bg-slate-900 group-hover:text-white">
+                <BellRing className="h-8 w-8" />
+              </div>
+              <div>
+                <h3 className="mb-4 text-2xl font-bold text-slate-950">Peace of mind</h3>
+                <p className="leading-relaxed text-slate-600">
+                  Receive a gentle notification only if a dose is missed, keeping you
+                  informed, not anxious.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="benefits" className="bg-[#f8f9ff] px-6 py-24">
+        <div className="mx-auto flex max-w-7xl flex-col gap-20 md:flex-row">
+          <div className="md:w-1/2">
+            <div className="md:sticky md:top-32">
+              <span className="mb-4 block text-sm font-semibold uppercase tracking-[0.12em] text-slate-500">
+                Core Benefits
+              </span>
+              <h2 className="mb-8 text-4xl font-bold leading-tight tracking-tight text-slate-950 md:text-5xl">
+                Designed for the modern family.
+              </h2>
+              <div className="mb-8 h-1 w-24 bg-teal-300" />
+              <p className="text-lg leading-relaxed text-slate-600">
+                Aging should not mean losing privacy. Serene Guardian stays in the
+                background and only surfaces when attention is truly needed.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-12 md:w-1/2">
+            <div className="flex gap-6">
+              <div className="shrink-0 text-teal-700">
+                <Smile className="h-9 w-9" />
+              </div>
+              <div>
+                <h4 className="mb-3 text-xl font-bold text-slate-950">Reduce worry</h4>
+                <p className="leading-relaxed text-slate-600">
+                  Stop wondering if they remembered. Get a clear signal when everything is
+                  on track.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-6">
+              <div className="shrink-0 text-teal-700">
+                <Users className="h-9 w-9" />
+              </div>
+              <div>
+                <h4 className="mb-3 text-xl font-bold text-slate-950">
+                  Respect independence
+                </h4>
+                <p className="leading-relaxed text-slate-600">
+                  Remove the “nagging” dynamic and preserve a healthier parent-child
+                  relationship.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-6">
+              <div className="shrink-0 text-teal-700">
+                <BarChart3 className="h-9 w-9" />
+              </div>
+              <div>
+                <h4 className="mb-3 text-xl font-bold text-slate-950">Stay informed</h4>
+                <p className="leading-relaxed text-slate-600">
+                  Spot patterns early with simple summaries and alerts delivered straight to
+                  your phone.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="waitlist" className="px-6 py-24">
+        <div className="mx-auto flex max-w-5xl flex-col overflow-hidden rounded-3xl shadow-2xl shadow-slate-900/10 md:flex-row">
+          <div className="bg-slate-900 p-12 text-white md:w-1/2">
+            <h2 className="mb-6 text-3xl font-bold tracking-tight">
+              Join the early access circle.
+            </h2>
+            <p className="text-lg leading-relaxed text-slate-300">
+              We’re opening the pilot to a limited number of families. Reserve your spot
+              today for a calmer tomorrow.
             </p>
-          )}
-        </section>
-      </div>
+          </div>
+
+          <div className="bg-white p-12 md:w-1/2">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label
+                  htmlFor="fullName"
+                  className="mb-2 block text-sm font-semibold text-slate-600"
+                >
+                  Full Name
+                </label>
+                <input
+                  id="fullName"
+                  type="text"
+                  placeholder="Jane Doe"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full rounded-lg border-0 bg-slate-100 px-4 py-3 text-slate-900 outline-none ring-0 placeholder:text-slate-400 focus:bg-slate-50 focus:ring-2 focus:ring-teal-300"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="mb-2 block text-sm font-semibold text-slate-600"
+                >
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="jane@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg border-0 bg-slate-100 px-4 py-3 text-slate-900 outline-none ring-0 placeholder:text-slate-400 focus:bg-slate-50 focus:ring-2 focus:ring-teal-300"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="w-full rounded-lg bg-black py-4 text-lg font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {status === "loading" ? "Joining..." : "Get early access"}
+              </button>
+
+              {message ? (
+                <p
+                  className={`text-sm ${
+                    status === "success" ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {message}
+                </p>
+              ) : null}
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-slate-100 px-6 py-12">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 md:flex-row">
+          <div className="flex flex-col gap-2">
+            <span className="text-lg font-bold text-slate-900">Serene Guardian</span>
+            <p className="max-w-md text-sm tracking-wide text-slate-500">
+              © 2026 Serene Guardian. Calm medication support for modern families.
+            </p>
+          </div>
+
+          <div className="flex gap-8">
+            <a className="text-sm tracking-wide text-slate-500 transition hover:text-slate-800" href="#">
+              Privacy Policy
+            </a>
+            <a className="text-sm tracking-wide text-slate-500 transition hover:text-slate-800" href="#">
+              Terms of Service
+            </a>
+            <a className="text-sm tracking-wide text-slate-500 transition hover:text-slate-800" href="#">
+              Contact Support
+            </a>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
